@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고려대학교 장터</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🐯 고려대 장터</h1>
+                <nav class="nav">
+                    <button class="btn-text" id="btnMyPosts" style="display: none;">내 판매글</button>
+                    <button class="btn-text" id="btnAdmin" style="display: none;">관리자</button>
+                    <button class="btn-text" id="btnLogin">로그인</button>
+                    <button class="btn-primary" id="btnWrite" style="display: none;">글쓰기</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main">
+        <div class="container">
+            <!-- 검색 및 필터 -->
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
+                    <button id="btnSearch">🔍</button>
+                </div>
+                <div class="category-filter">
+                    <button class="category-btn active" data-category="all">전체</button>
+                    <button class="category-btn" data-category="electronics">전자기기</button>
+                    <button class="category-btn" data-category="books">도서</button>
+                    <button class="category-btn" data-category="fashion">의류</button>
+                    <button class="category-btn" data-category="etc">기타</button>
+                </div>
+            </div>
+
+            <!-- 게시글 목록 -->
+            <div class="posts-grid" id="postsGrid">
+                <!-- 게시글이 동적으로 추가됩니다 -->
+            </div>
+
+            <!-- 빈 상태 -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <p>📦</p>
+                <h3>등록된 상품이 없습니다</h3>
+                <p>첫 번째 상품을 등록해보세요!</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 로그인 모달 -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>로그인</h2>
+                <button class="btn-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>이메일</label>
+                    <input type="email" id="loginEmail" placeholder="example@korea.ac.kr">
+                </div>
+                <div class="form-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="loginPassword" placeholder="비밀번호를 입력하세요">
+                </div>
+                <button class="btn-primary btn-full" onclick="login()">로그인</button>
+                <p class="text-center mt-2">
+                    계정이 없으신가요? 
+                    <a href="#" onclick="showRegisterModal()">회원가입</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 회원가입 모달 -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>회원가입</h2>
+                <button class="btn-close" onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>이메일 (@korea.ac.kr)</label>
+                    <input type="email" id="registerEmail" placeholder="example@korea.ac.kr">
+                </div>
+                <div class="form-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="registerPassword" placeholder="비밀번호를 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="registerName" placeholder="이름을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label>학번</label>
+                    <input type="text" id="registerStudentId" placeholder="학번을 입력하세요">
+                </div>
+                <button class="btn-primary btn-full" onclick="register()">가입하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 글쓰기 모달 -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>상품 등록</h2>
+                <button class="btn-close" onclick="closeModal('writeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="postForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>제목</label>
+                        <input type="text" id="postTitle" name="title" placeholder="제목을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label>카테고리</label>
+                        <select id="postCategory" name="category" required>
+                            <option value="electronics">전자기기</option>
+                            <option value="books">도서</option>
+                            <option value="fashion">의류</option>
+                            <option value="etc">기타</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>가격 (원)</label>
+                        <input type="number" id="postPrice" name="price" placeholder="가격을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label>설명</label>
+                        <textarea id="postContent" name="content" rows="5" placeholder="상품 설명을 입력하세요" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>이미지 (최대 5개, 각 10MB 이하)</label>
+                        <div class="image-upload-area">
+                            <input type="file" id="postImages" name="images" multiple accept="image/*" style="display: none;">
+                            <button type="button" class="btn-upload" onclick="document.getElementById('postImages').click()">
+                                📷 이미지 선택
+                            </button>
+                            <div id="imagePreview" class="image-preview-grid"></div>
+                        </div>
+                        <small class="text-muted">총 용량: <span id="totalSize">0 MB</span></small>
+                    </div>
+                    <button type="button" class="btn-primary btn-full" onclick="createPost()">등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게시글 상세 모달 -->
+    <div class="modal" id="postDetailModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="detailTitle"></h2>
+                <button class="btn-close" onclick="closeModal('postDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 확대 모달 -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content modal-image">
+            <button class="btn-close btn-close-image" onclick="closeModal('imageModal')">&times;</button>
+            <img id="enlargedImage" src="" alt="확대 이미지">
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

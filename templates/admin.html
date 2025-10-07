@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 고려대학교 장터</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🐯 고려대 장터 - 관리자</h1>
+                <nav class="nav">
+                    <button class="btn-text" onclick="window.location.href='/'">홈으로</button>
+                    <button class="btn-text" id="btnLogout">로그아웃</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main">
+        <div class="container">
+            <h2>인사이트</h2>
+            <div id="insightsSection" class="insights-section"></div>
+
+            <h2>게시물 관리</h2>
+            <div class="posts-grid" id="adminPostsGrid"></div>
+
+            <h2>계정 관리</h2>
+            <div id="usersSection" class="users-section"></div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>
